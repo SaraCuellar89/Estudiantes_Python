@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <h1>Inicio de Sesion</h1>
+
+    <form action="/" method="POST">
+        <div class="caja_input">
+            <label for="nombre_usuario">Usuario</label>
+            <input type="text" name="nombre_usuario" id="nombre_usuario">
+        </div>
+
+        <div class="caja_input">
+            <label for="contrasena">Contraseña</label>
+            <input type="password" name="contrasena" id="contrasena">
+            <button type="button" id="ver_contrasena">ver</button>
+        </div>
+
+        <button type="submit">Entrar</button>
+    </form>
+
+</body>
+
+<style>
+    body{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+    }
+    form{
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        border-radius: 20px;
+        border: solid 1px black;
+        box-shadow: black 0px 2px 5px;
+    }
+    .caja_input{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+</style>
+
+<script>
+
+    let ver = false;
+    const input_contrasena = document.getElementById('contrasena');
+    let btn_ver_contrasena = document.getElementById('ver_contrasena');
+
+    document.getElementById('ver_contrasena').addEventListener('click', () => {
+        if(ver === false){
+            input_contrasena.type = "text";
+            btn_ver_contrasena.innerText = "Ocultar";
+            ver = true;
+        }
+        else{
+            input_contrasena.type = "password";
+            btn_ver_contrasena.innerText = "Ver";
+            ver = false;
+        }
+    });
+
+</script>
+
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <h1>Carga Masiva</h1>
+
+    <form action="/carga_masiva" method="POST" enctype="multipart/form-data">
+        <div class="caja_input">
+            <label for="archivo">Seleccionar Archivo</label>
+            <input type="file" name="archivo" id="archivo" required>
+        </div>
+
+        <button type="submit">Cargar</button>
+    </form>
+
+    {% if resumen %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Resultado</th>
+                <th>Cantidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fila in resumen %}
+            <tr>
+                <td>{{ fila.categoria }}</td>
+                <td>{{ fila.cantidad }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {% if hay_rechazados %}
+        <a href="/descargar_rechazados">⬇️ Descargar registros rechazados</a>
+    {% endif %}
+
+</body>
+
+<style>
+    body{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+    }
+    form{
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        border-radius: 20px;
+        border: solid 1px black;
+        box-shadow: black 0px 2px 5px;
+    }
+    .caja_input{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+</style>
+</html>

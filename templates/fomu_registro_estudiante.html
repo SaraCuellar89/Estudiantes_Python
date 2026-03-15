@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <h1>Registro Estudiante</h1>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    <form action="/registrar_estudiante" method="POST">
+        <div class="caja_input">
+            <label for="nombre">Nombre</label>
+            <input type="text" name="nombre" id="nombre" required>
+        </div>
+
+        <div class="caja_input">
+            <label for="edad">Edad</label>
+            <input type="number" name="edad" id="edad" required>
+        </div>
+
+
+        <div class="caja_input">
+            <label for="nombre">Carrera</label>
+            <select name="carrera" id="carrera" required>
+                <option value="Fisica">Fisica</option>
+            </select>
+        </div>
+
+        <div class="caja_input">
+            <label for="nota_1">Nota 1</label>
+            <input type="number" name="nota_1" id="nota_1" step="0.1" min="0" max="5" required>
+        </div>
+
+        <div class="caja_input">
+            <label for="nota_2">Nota 2</label>
+            <input type="number" name="nota_2" id="nota_2" step="0.1" min="0" max="5" required>
+        </div>
+
+        <div class="caja_input">
+            <label for="nota_3">Nota 3</label>
+            <input type="number" name="nota_3" id="nota_3" step="0.1" min="0" max="5" required>
+        </div>
+
+        <button type="submit">Registrar</button>
+    </form>
+
+</body>
+
+<style>
+    body{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+    }
+    form{
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        border-radius: 20px;
+        border: solid 1px black;
+        box-shadow: black 0px 2px 5px;
+    }
+    .caja_input{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+</style>
+    
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const res = await fetch('/obtener_carreras');
+        const datos = await res.json();
+
+        const carrera = document.getElementById("carrera");
+        
+        // Limpiar opciones previas
+        carrera.innerHTML = "";
+
+        datos.forEach(item => {
+            const option = document.createElement("option");
+            option.value = item.carrera;
+            option.textContent = item.carrera;
+            carrera.appendChild(option);
+        });
+    });
+</script>
+</html>
