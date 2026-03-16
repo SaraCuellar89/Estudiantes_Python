@@ -191,7 +191,7 @@ def cargar_datos_masivos():
         existentes = Obtener_Estudiantes()[["nombre", "carrera"]]
         mascara = df.apply(
             lambda r: ((existentes["nombre"] == r["Nombre"]) & 
-                       (existentes["carrera"] == r["Carrera"])).any(), axis=1
+                    (existentes["carrera"] == r["Carrera"])).any(), axis=1
         )
         ya_existentes = df[mascara].copy()
         if not ya_existentes.empty:
