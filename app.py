@@ -11,13 +11,8 @@ app.secret_key = "contrasena_1234"
 dash_app = crear_tablero(app)
 
 # ===================== Rutas =====================
-# Saludo
-@app.route("/saludar")
-def saludar():
-    return jsonify({"message": "Servirdor Flask Corriendo Correctamente"})
 
-
-# Evitar cache en paginas protegidas
+# --------- Evitar cache de paginas protegidas ---------
 @app.after_request
 def agregar_header(response):
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
@@ -26,7 +21,7 @@ def agregar_header(response):
     return response
 
 
-# Proteger rutas del dashboard
+# --------- Proteger rutas del dashboard ---------
 @app.before_request
 def proteger_rutas():
 
@@ -37,7 +32,7 @@ def proteger_rutas():
             return redirect("/")
 
 
-# Inicio de Sesion
+# --------- Inicio de Sesion ---------
 @app.route("/", methods=['GET','POST'])
 def iniciar_sesion():
     try:
@@ -71,20 +66,20 @@ def iniciar_sesion():
     return render_template("inicio_sesion.html")
 
 
-# Cerrar Sesion
+# --------- Cerrar Sesion ---------
 @app.route("/cerrar_sesion")
 def logout():
     session.clear()
     return redirect("/")
 
 
-# Ir a opciones de registro
+# --------- Opciones de registro de estudiantes ---------
 @app.route("/opciones_registro")
 def ir_opciones():
     return render_template("opciones.html")
 
 
-# Registro de un estudiante
+# --------- Registrar un solo estudiante ---------
 @app.route("/registrar_estudiante", methods=["GET", "POST"])
 def registrar_estudiante():
     
@@ -124,7 +119,7 @@ def registrar_estudiante():
     return render_template("fomu_registro_estudiante.html")
 
 
-# Carga Masiva
+# --------- Carga masiva ---------
 @app.route("/carga_masiva", methods=["GET", "POST"])
 def cargar_datos_masivos():
     if request.method == "POST":
@@ -263,13 +258,13 @@ def cargar_datos_masivos():
     return render_template("carga_masiva.html")
 
 
-# Decargar archivo de reachazados
+# --------- Descarga del archivo de rechazados ---------
 @app.route("/descargar_rechazados")
 def descargar_rechazados():
     return send_file("rechazados.xlsx", as_attachment=True, download_name="rechazados.xlsx")
  
 
-# Funcion para quitar acentos
+# --------- Funcion para quitar acentos ---------
 def quitar(texto):
     if pd.isna(texto):
         return texto
@@ -282,7 +277,7 @@ def quitar(texto):
     )
 
 
-# Clasificar el desempeño
+# --------- Clasificar desempeño ---------
 def calcular_desempeno(promedio):
     if promedio >= 4.5:
         desempeno = "Excelente"
@@ -295,13 +290,15 @@ def calcular_desempeno(promedio):
     return desempeno
 
 
-# Obtener todas las carreras 
+# --------- Obtener todas las carreras ---------
 @app.route("/obtener_carreras")
 def ruta_obtener_carreras():
     carreras = obtener_carreras()
     return jsonify(carreras)
 
 
+
+# --------- Llamado del servidor ---------
 if __name__ == "__main__":
     try:
         conexion = conectar()

@@ -7,16 +7,15 @@ from database import Obtener_Estudiantes
 from flask import session
 
 
-# ===================== Cargar datos =====================
 def crear_tablero(server):
 
-    # Iniciar app
+    # ===================== Inicializar app =====================
     appnotas = dash.Dash(__name__, server=server, url_base_pathname="/dash_principal/", suppress_callback_exceptions=True)
 
-    # Carga inicial SOLO para valores por defecto del layout
+    # ===================== Cargar datos iniciales =====================
     _init = Obtener_Estudiantes()
 
-    # Layout
+    # ===================== Renderizado del dashboard =====================
     appnotas.layout = html.Div([
         
         html.H1("Dashboard de Notas", style={
@@ -27,30 +26,35 @@ def crear_tablero(server):
             "borderRadius": "10px"
         }),
 
-        # Contenedor de filtros
+        # --------- Contenedor de filtros ---------
         html.Div([
             html.Label("Seleccionar carrera:", style={"fontWeight": "bold"}),
+            
+            # --------- Filtro de carrera ---------
             dcc.Dropdown(
                 id="filtro_carrera",
-                options=[{"label": "Todas", "value": "Todas"}] + 
-                        [{"label": ca, "value": ca} for ca in sorted(_init["carrera"].unique())],
+                options=[{"label": "Todas", "value": "Todas"}] +
+                        [{"label": c, "value": c} for c in sorted(_init["carrera"].unique())],
                 value="Todas"
             ),
             
             html.Br(),
             
-            html.Label("Rango de edad:", style={"fontWeight": "bold"}), 
+            html.Label("Rango de edad:", style={"fontWeight": "bold"}),
+             
+            # --------- Filtro de edad --------- 
             dcc.RangeSlider(
                 id="slider_edad",
-                min=_init["edad"].min(),
-                max=_init["edad"].max(),
                 step=1,
-                value=[_init["edad"].min(), _init["edad"].max()],
-                marks={i: str(i) for i in range(int(_init["edad"].min()), int(_init["edad"].max())+1, 5)},
-                tooltip={"placement": "bottom", "always_visible": True} 
+                min=int(_init["edad"].min()),
+                max=int(_init["edad"].max()),
+                value=[int(_init["edad"].min()), int(_init["edad"].max())],
+                marks={i: str(i) for i in range(int(_init["edad"].min()), int(_init["edad"].max()) + 1, 5)},
+                tooltip={"placement": "bottom", "always_visible": True}
             ),
 
             html.Br(),
+            
             html.Label("Rango promedio:", style={"fontWeight": "bold"}),
             dcc.RangeSlider(
                 id="slider_promedio",
@@ -59,13 +63,13 @@ def crear_tablero(server):
                 step=0.1,
                 value=[0, 5],
                 tooltip={"placement": "bottom", "always_visible": True}
-            )
+            ),
 
         ], style={"width": "80%", "margin": "auto", "padding": "20px", "border": "1px solid #ccc", "borderRadius": "10px"}),
         
         html.Br(),
         
-        # Contenedor de KPIs
+        # --------- Contenedor de KPIS ---------
         html.Div(id="kpis", style={
             "display": "flex",
             "justifyContent": "space-around"
@@ -73,7 +77,7 @@ def crear_tablero(server):
         
         html.Br(),
         
-        # Barra de busqueda
+        # --------- Barra de Busqueda ---------
         dcc.Input(
             id="busqueda",
             type="text",
@@ -92,7 +96,7 @@ def crear_tablero(server):
             n_intervals=0
         ),
         
-        # Tabla
+        # --------- Tabla con todos los estudiantes ---------
         dcc.Loading(
             children=[
                 dash_table.DataTable(
@@ -104,7 +108,7 @@ def crear_tablero(server):
                     selected_rows=[],
                     style_table={"overflowX": "auto"},
                     style_cell={"textAlign": "center", "padding": "10px"},
-                    style_header={"backgroundColor": "#f2f2f2", "fontWeight": "bold"}
+                    style_header={"backgroundColor": "#000000", "fontWeight": "bold", "color": "white"}
                 )
             ],
             type="circle" 
@@ -114,7 +118,7 @@ def crear_tablero(server):
         
         dcc.Graph(id="gran_detallado"),
         
-        # Gráficos en pestañas
+        # --------- Pestañas para ver las graficas ---------
         dcc.Tabs([
             dcc.Tab(label="Histograma Promedios", children=[dcc.Graph(id="histograma")]), 
             dcc.Tab(label="Dispersión Edad vs Nota", children=[dcc.Graph(id="dispersion")]), 
@@ -124,7 +128,7 @@ def crear_tablero(server):
 
         html.Br(),
 
-        # Top 10 mejores estudiantes
+        # --------- Tabla de los mejos 10 estudiantes ---------
         html.H3("Top 10 Mejores Estudiantes", style={"textAlign": "center"}),
         dash_table.DataTable(
             id="ranking",
@@ -140,7 +144,7 @@ def crear_tablero(server):
 
         html.Br(),
 
-        # Estudiantes con un promedio bajo
+        # --------- Tabla con estudiantes en riesgo (promedio menor a 3) ---------
         html.H3("Estudiantes en Riesgo", style={"textAlign": "center"}),
         dash_table.DataTable(
             id="riesgo",
@@ -154,7 +158,7 @@ def crear_tablero(server):
             },
         ),
         
-        # Boton para cerrar sesion
+        # --------- Boton para cerrar sesion ---------
         html.A("Cerrar Sesión",
             href="/cerrar_sesion",
             style={
@@ -170,7 +174,7 @@ def crear_tablero(server):
             }
         ), 
         
-        # Boton para registrar estudiante
+        # --------- Boton para registrar estudiantes ---------
         html.A("Registrar Estudiante",
             href="/opciones_registro",
             style={
@@ -189,7 +193,7 @@ def crear_tablero(server):
     ], style={"fontFamily": "Arial"}) 
 
 
-    # Callback para tabla 2
+    # ===================== Callback y funcion para actualizar la tabla de todos los estudiantes =====================
     @appnotas.callback(
         Output("gran_detallado", "figure"),
         Input("Tabla", "derived_virtual_data"),
@@ -214,9 +218,38 @@ def crear_tablero(server):
         fig = px.scatter(dff, x="edad", y="promedio", color="desempeno", size="promedio", title="Análisis Detallado (Selecciona filas en la tabla)")
 
         return fig
+    
+    
+    # ===================== Callback y funcion para actualizar el dropdown de las carreras =====================
+    @appnotas.callback(
+        Output("filtro_carrera", "options"),
+        Input("intervalo", "n_intervals"),
+    )
+    def actualizar_opciones_carrera(n_intervals):
+        dataf = Obtener_Estudiantes()
+        carreras = sorted(dataf["carrera"].unique())
+        return [{"label": "Todas", "value": "Todas"}] + \
+            [{"label": c, "value": c} for c in carreras]
+            
+        
+    # ===================== Callback y funcion para actualizar el dropdown de las edades =====================  
+    @appnotas.callback(
+        Output("slider_edad", "min"),
+        Output("slider_edad", "max"),
+        Output("slider_edad", "value"),
+        Output("slider_edad", "marks"),
+        Input("intervalo", "n_intervals"),
+    )
+    def actualizar_slider_edad(n_intervals):
+        dataf = Obtener_Estudiantes()
+        min_e = int(dataf["edad"].min())
+        max_e = int(dataf["edad"].max())
+        marks = {i: str(i) for i in range(min_e, max_e + 1, 5)}
+        return min_e, max_e, [min_e, max_e], marks
+           
 
 
-    # Callback para Tabla y KPIs
+    # ===================== Callback y funcion para actualizar el grafico de KPIS  =====================
     @appnotas.callback(
         Output("Tabla", "data"),
         Output("Tabla", "columns"),
@@ -227,9 +260,10 @@ def crear_tablero(server):
         Input("busqueda", "value"),
         Input("intervalo", "n_intervals"),
     )
-
-
     def actualizar_comp(carrera, rangoedad, rangoprome, busqueda, n_intervals):
+        
+        if rangoedad is None or rangoprome is None:
+            return [], [], []
         
         dataf = Obtener_Estudiantes()
         
@@ -280,7 +314,7 @@ def crear_tablero(server):
         return filtro.to_dict("records"), columnas, kpis_html
 
 
-    # Callbacks para los gráficos (faltaban estas funciones)
+    # ===================== Callback y funcion para actualizar los graficos de las pestañas =====================
     @appnotas.callback(
         Output("histograma", "figure"),
         Output("dispersion", "figure"),
@@ -290,6 +324,9 @@ def crear_tablero(server):
         Input("intervalo", "n_intervals"),
     )
     def actualizar_graficos(carrera, n_intervals):
+        
+        if carrera is None:
+            carrera = "Todas"
         
         dataf = Obtener_Estudiantes()
 
@@ -306,12 +343,12 @@ def crear_tablero(server):
         return fig_hist, fig_disp, fig_pie, fig_prom_car
     
 
-    # Top 10 mejores estudiantes
+    # ===================== Callback y funcion para actualizar la tabla de top 10 mejores estudiantes =====================
     @appnotas.callback(
-    Output("ranking", "data"),
-    Output("ranking", "columns"),
-    Input("intervalo", "n_intervals"),
-)
+        Output("ranking", "data"),
+        Output("ranking", "columns"),
+        Input("intervalo", "n_intervals"),
+    )
     def actualizar_ranking(n_intervals):
         dataf = Obtener_Estudiantes()
         
@@ -328,12 +365,12 @@ def crear_tablero(server):
         return top10.to_dict("records"), columnas
 
 
-    # Estudiantes en riegsgo
+    # ===================== Callback y funcion para actualizar la tabla de estudiantes en riesgo =====================
     @appnotas.callback(
-    Output("riesgo", "data"),
-    Output("riesgo", "columns"),
-    Input("intervalo", "n_intervals"),
-)
+        Output("riesgo", "data"),
+        Output("riesgo", "columns"),
+        Input("intervalo", "n_intervals"),
+    )
     def actualizar_estudiantes_riesgo(n_intervals):
         dataf = Obtener_Estudiantes()
         
@@ -349,4 +386,5 @@ def crear_tablero(server):
         return riesgo.to_dict("records"), columnas
     
     
+    # ===================== Exportacion de todo el dashboard =====================
     return appnotas

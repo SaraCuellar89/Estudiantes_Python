@@ -7,6 +7,10 @@
 </head>
 <body>
 
+    <button onclick="window.location.href='/dash_principal'">
+        DashBoard
+    </button>
+
     <h1>Carga Masiva</h1>
 
     <form action="/carga_masiva" method="POST" enctype="multipart/form-data">
@@ -68,6 +72,14 @@
         justify-content: center;
         align-items: center;
         gap: 10px;
+    }
+    button{
+        background-color: black;
+        color: white;
+        padding: 10px;
+        font-size: 20px;
+        border-radius: 10px;
+        cursor: pointer;
     }
 </style>
 </html>
